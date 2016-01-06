@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+  <head>
+      <meta charset="utf-8">
+    <meta name="description" content="A basic template for a Chrome Extension using Twitter Bootstrap 3">
+    <meta name="author" content="Elliot Hesp">
+    
+    <title>Datadog</title>
+    
+    <!-- Scripts -->
+    <script src="js/jquery-2.0.3.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/helper.js"></script>
+    <script src="js/md5.min.js"></script>
+    <script src="js/storage_check.js"></script>
+    <!-- Cascading Style Sheets -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="css/custom.css" rel="stylesheet" media="screen">    
+  </head>
+  
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-inverse" role="navigation">
+      <div id="logo" class="navbar-header"></div>
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav">
+          <li id="embeds-btn">
+            <a>Embeds</a>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li id="add-embed-nav">
+                <a>Add Embed</a>
+              </li>
+              <li id="get-embed-nav">
+                <a>Get Embed</a>
+              </li>
+              <li id="create-embed-nav">
+                <a>Create Embed</a>
+              </li>
+              <li id="enable-embed-nav">
+                <a>Enable Embed</a>
+              </li>
+              <li id="revoke-embed-nav">
+                <a>Revoke Embed</a>
+              </li>
+              <li id="delete-embed-nav">
+                <a>Delete Embed</a>
+              </li>
+            </ul>
+          </li>
+          <li id="refresh-ssl-btn">
+            <a>Refresh SSL</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+
+
+
+    <!-- Error/Success Messages -->
+    <div id="embed-clear-success" class="alert alert-success">
+      <strong>Obliviate!</strong> All embeds removed from extension.
+    </div>
+    <div id="embed-delete-success" class="alert alert-success">
+      <strong>Headshot!</strong> Selected embeds removed from extension
+    </div>
+    <div id="embed-add-success" class="alert alert-success">
+      <strong>Nice!</strong> New embed added!
+    </div>
+    <div id="embed-enable-success" class="alert alert-success">
+      <strong>Nice!</strong> Embed(s) successfully enabled!
+    </div>
+    <div id="embed-revoke-success" class="alert alert-success">
+      <strong>Nice!</strong> Embed(s) successfully revoked!
+    </div>
+    <div id="embed-add-failure" class="alert alert-warning">
+      <strong>Oops!</strong> Please submit a non-empty form.
+    </div>
+    <div id="embed-check-failure" class="alert alert-warning">
+      <strong>Oops!</strong> Please check at least one embed.
+    </div>
+    <div id="request-failure" class="alert alert-danger">
+      <strong>Darn!</strong> The request failed for some reason. Please inspect!
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="admin" class="container-fluid">
+      <div class="box col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <h2>Admin Dashboard</h2>
+      </div>
+      <!-- Add Embed -->
+      <div id="add-embed" class="admin-option box col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <form action="" method="POST" role="form">
+          <div class="form-group">
+            <label>Add Embed</label>
+            <textarea class="form-control" id="add-embed-textarea" rows="6" placeholder="Embed IFrame Code"></textarea>
+            <br>
+            <button id="add-embed-btn" type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Get Embed via API -->
+      <div id="get-embed" class="admin-option box col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <form action="" method="POST" role="form">
+          <div class="form-group">
+            <label>Get Embed</label>
+            <input type="text" id="get-embed-input" class="form-control" value="" required="required" placeholder="embed_id">
+            <br>
+            <button id="get-embed-btn" type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Create Embed Via API -->
+      <div id="create-embed" class="admin-option box col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <form action="" method="POST" role="form">
+          <div class="form-group">
+            <label>Create Embed</label>
+            <textarea class="form-control" id="create-embed-graph-json" rows="6" placeholder="JSON Graph Definition"></textarea>
+            <br>
+            <label>Timeframe</label>
+            <select name="timeframe" id="create-embed-timeframe" class="form-control">
+              <option value="1_hour" selected="selected">1_hour</option>
+              <option value="4_hours">4_hours</option>
+              <option value="1_day">1_day</option>
+              <option value="2_days">2_days</option>
+              <option value="1_week">1_week</option>
+            </select>
+            <br>
+            <label>Size</label>
+            <select name="size" id="create-embed-size" class="form-control">
+              <option value="small">small</option>
+              <option value="medium" selected="selected">medium</option>
+              <option value="large">large</option>
+              <option value="xlarge">xlarge</option>
+            </select>        
+            <br>
+            <label>Legend</label>
+            <select name="legend" id="create-embed-legend" class="form-control">
+              <option value="no" selected="selected">no</option>
+              <option value="yes">yes</option>
+            </select>        
+            <br>
+            <button id="create-embed-btn" type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>    
+      </div> 
+
+      <!-- Delete Embed -->
+      <div id="delete-embed" class="admin-option box col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <form action="" method="POST" role="form">
+          <div class="form-group">
+            <label>Delete Embed</label>
+            <div id="delete-embed-checkbox" class="checkbox">
+              <!-- APPEND EMBED IDS -->
+            </div>
+            <br>
+            <button id="delete-embed-btn" type="submit" class="btn btn-primary">Delete Selected</button>
+            <button id="clear-all-btn" type="submit" class="btn btn-danger">Clear all Embeds</button>
+          </div>
+        </form>    
+      </div> 
+
+      <!-- Enable Embed -->
+      <div id="enable-embed" class="admin-option box col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <form action="" method="POST" role="form">
+          <div class="form-group">
+            <label>Enable Embed</label>
+            <div id="enable-embed-checkbox" class="checkbox">
+              <!-- APPEND EMBED IDS -->
+            </div>
+            <br>
+            <button id="enable-embed-btn" type="submit" class="btn btn-primary">Enable Selected</button>
+            <button id="enable-all-btn" type="submit" class="btn btn-danger">Enable all Embeds</button>
+          </div>
+        </form>    
+      </div> 
+
+      <!-- Revoke Embed -->
+      <div id="revoke-embed" class="admin-option box col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <form action="" method="POST" role="form">
+          <div class="form-group">
+            <label>Revoke Embed</label>
+            <div id="revoke-embed-checkbox" class="checkbox">
+              <!-- APPEND EMBED IDS -->
+            </div>
+            <br>
+            <button id="revoke-embed-btn" type="submit" class="btn btn-primary">Revoke Selected</button>
+            <button id="revoke-all-btn" type="submit" class="btn btn-danger">Revoke all Embeds</button>
+          </div>
+        </form>    
+      </div> 
+    </div>
+
+
+    <!-- Embeds -->
+    <div id="embeds" class="container-fluid embeds">
+      <div class="box col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <h2>Datadog Embedded Graphs</h2>
+      </div>
+    </div>
+
+
+
+    <!-- Refresh SSL -->
+    <div id="refresh-ssl" class="container-fluid embeds">
+      <div class="box col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <h2>API SSL Refresh</h2>
+      </div>
+      <div class="box col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <ul>
+          <li>
+              Click this link to open the API in a chrome tab: <a id="api-link">API Site</a>
+          </li>
+          <li>
+              If a blank page appears with <code>{"errors": ["API key required"]}</code>, then you are good to go to make API calls within this extension.</li>
+          <li>
+              Otherwise, click on "advanced" in the left corner of the warning and continue to the site. 
+              This overrides Chrome from preventing you from accessing the API due to SSL certificate issues.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+
+  </body>
+</html>
+
